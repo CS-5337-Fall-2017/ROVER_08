@@ -102,7 +102,13 @@ public class ROVER_08 extends Rover {
 			int stepCount = 0;	
 			String line = "";	
 			boolean goingSouth = false;
+			boolean goingEast = false;
+			boolean goingWest = false;
+			boolean goingNorth = false;
+
+			
 			boolean stuck = false; // just means it did not change locations between requests,
+			
 									// could be velocity limit or obstruction etc.
 			boolean blocked = false;
 	
