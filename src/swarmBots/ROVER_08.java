@@ -4,18 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import MapSupport.Coord;
 import MapSupport.MapTile;
-import MapSupport.ScanMap;
 import common.Rover;
 import communicationInterface.Communication;
 import enums.Terrain;
@@ -29,11 +20,6 @@ import enums.Terrain;
 /**
  * 
  * @author rkjc
- * 
- * ROVER_08 is intended to be a basic template to start building your rover on
- * Start by refactoring the class name to match your rovers name.
- * Then do a find and replace to change all the other instances of the 
- * name "ROVER_08" to match your rovers name.
  * 
  * The behavior of this robot is a simple travel till it bumps into something,
  * sidestep for a short distance, and reverse direction,
