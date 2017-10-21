@@ -16,7 +16,7 @@ public enum RoverConfiguration {
 	NONE,
 
 	ROVER_01 ("WHEELS", "EXCAVATOR", "CHEMICAL_SENSOR"),
-	ROVER_02 ("WALKER", "SPECTRAL_SENSOR", "DRILL"),
+	ROVER_02 ("WALKER", "SPECTRAL_SENSOR", "DRILL!"),
 	ROVER_03 ("TREADS", "EXCAVATOR", "RADAR_SENSOR"),
 
 	//not currently being used
@@ -37,7 +37,7 @@ public enum RoverConfiguration {
 	ROVER_18 ("WHEELS", "EXCAVATOR", "RADAR_SENSOR"),
 	ROVER_19 ("NONE", "NONE", "NONE"),
 	ROVER_20 ("NONE", "NONE", "NONE"),
-	
+
 	ROVER_31 ("WALKER", "DRILL", "EXCAVATOR"),
 	ROVER_32 ("WHEELS", "RANGE_BOOTER", "SPECTRAL_SENSOR"),
 	ROVER_33 ("WHEELS", "EXCAVATOR", "CHEMICAL_SENSOR"),
@@ -47,7 +47,7 @@ public enum RoverConfiguration {
 	ROVER_37 ("WHEELS", "RANGE_BOOTER", "RADAR_SENSOR"),
 	ROVER_38 ("WHEELS", "EXCAVATOR", "RADAR_SENSOR"),
 	ROVER_39 ("NONE", "NONE", "NONE"),
-	
+
 	ROVER_41 ("WALKER", "DRILL", "EXCAVATOR"),
 	ROVER_42 ("WHEELS", "RANGE_BOOTER", "SPECTRAL_SENSOR"),
 	ROVER_43 ("WHEELS", "EXCAVATOR", "CHEMICAL_SENSOR"),
@@ -147,9 +147,9 @@ public enum RoverConfiguration {
     	case "ROVER_20":
     		output = RoverConfiguration.ROVER_20;
     		break;
-    	
+
     	//Past semester archive of star rovers
-    		
+
     	case "ROVER_31":
     		output = RoverConfiguration.ROVER_31;
     		break;
@@ -177,9 +177,9 @@ public enum RoverConfiguration {
     	case "ROVER_39":
     		output = RoverConfiguration.ROVER_39;
     		break;
-    		
-    		
-    		
+
+
+
     	case "ROVER_41":
     		output = RoverConfiguration.ROVER_41;
     		break;
@@ -207,7 +207,7 @@ public enum RoverConfiguration {
     	case "ROVER_49":
     		output = RoverConfiguration.ROVER_49;
     		break;
-    		
+
 
     	// Sample Rover Set
     	case "ROVER_90":
