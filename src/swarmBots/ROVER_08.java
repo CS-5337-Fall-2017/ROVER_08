@@ -204,7 +204,7 @@ public class ROVER_08 extends Rover {
 	        Set<Coord> tilesRoverCanAddInformationAbout = null; // coords of all tiles rover can gather
 	        Set<Coord> unexploredTiles = null; // coords of all tiles with Terrain.UNKOWN
 	        Set<Coord> teamMemberLocations = null;
-	        Set<Coord> tilesThatContainedScannableScience = null;
+	        Set<Coord> tilesRoverCanRescan = null;
 	        
 	        Coord closestResourceCanGather = null; // closest resource rover can pick up
 	        Coord closestTileToExplore = null; // closest tile that the rover can reveal some information about
@@ -280,7 +280,7 @@ public class ROVER_08 extends Rover {
 	            tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
 	            unexploredTiles = unknownTiles(tiles);
 	            teamMemberLocations = teamMemberLocations(tiles);       
-	            tilesThatContainedScannableScience = tilesThatContainedScannableScience(tiles); 
+	            tilesRoverCanRescan = tilesRoverCanRescan(tiles); 
 	            
 	            // testing...
 	            // prints out many variables to the Console to see if the are correct for debug purposes
@@ -295,7 +295,7 @@ public class ROVER_08 extends Rover {
 				System.out.println("resources " + rovername + " tiles can walk on: " + tilesRoverCanWalkOn.size());
 				System.out.println("resources " + rovername + " tiles can gather: " + tilesRoverCanGather.size());
 				System.out.println("resources " + rovername + " tiles can protect: " + tilesRoverCanProtect.size());
-				System.out.println("resources " + rovername + " tiles can rescan: " + tilesThatContainedScannableScience.size());
+				System.out.println("resources " + rovername + " tiles can rescan: " + tilesRoverCanRescan.size());
 				
 				// this is the Rovers HeartBeat, it regulates how fast the Rover cycles through the control loop
 				// sleep until move cooldown is over
@@ -1020,7 +1020,7 @@ public class ROVER_08 extends Rover {
 	 * @param coordMaping The map data.
 	 * @return Returns a set of coordinates of tiles that used to contain (but is no longer reported as containing) the types of science that is scannable by the rover.
 	 */
-	private Set<Coord> tilesThatContainedScannableScience(Map<Coord, MapTile> coordMaping) {
+	private Set<Coord> tilesRoverCanRescan(Map<Coord, MapTile> coordMaping) {
 		Set<Coord> result = new HashSet<>();
 		if (sensors.isEmpty()) {
 			return result;
