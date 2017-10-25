@@ -277,7 +277,7 @@ public class ROVER_08 extends Rover {
 	            tilesRoverCanGather = tilesRoverCanGather(tiles);
 	            tilesRoverCanProtect = tilesRoverCanProtect(tiles);
 	            tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
-	            unexploredTiles = unkownTiles(tiles);
+	            unexploredTiles = unknownTiles(tiles);
 	            teamMemberLocations = teamMemberLocations(tiles);       
 	            
 	            //TODO add set of all resources revield
@@ -1017,9 +1017,9 @@ public class ROVER_08 extends Rover {
 	 * 
 	 * @return Set<Coord> subset of globalMap.getAllTiles().keySet()
 	 */
-	private Set<Coord> unkownTiles(Map<Coord, MapTile> coordMaping) {
+	private Set<Coord> unknownTiles(Map<Coord, MapTile> coordMaping) {
 		
-		Set<Coord> uknownTiles = new HashSet<>();
+		Set<Coord> unknownTiles = new HashSet<>();
 		
 		Coord coord;
 		MapTile tile;
@@ -1033,11 +1033,11 @@ public class ROVER_08 extends Rover {
 			
 			if(terrain.equals(Terrain.UNKNOWN.getTerString())) {
 				
-				uknownTiles.add(coord);
+				unknownTiles.add(coord);
 			}
 		}
 		
-		return uknownTiles;
+		return unknownTiles;
 	}
 	
 	//TODO add set of all resources revield
