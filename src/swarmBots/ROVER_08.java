@@ -83,6 +83,14 @@ public class ROVER_08 extends Rover {
 	private long gatherCooldown = 3400L + lagCushion; // default to gather speed from RPC + 30
 	private long sleepTime = 200L;
 	
+	/**
+     * This keeps track of all tiles that, at any point in time during the competition,
+     * has contained a resource that could be scanned by the rover, regardless of
+     * whether the said resource is still available to be gathered.
+     */
+    Set<Coord> tilesRoverCanRescan = new HashSet<>();
+	
+    /** Contains a mapping of which resource can be picked up by which scanner. */
 	private final Map<Science, RoverToolType> resourceScannerMap = new HashMap<>();
 	
 	/**
@@ -204,7 +212,6 @@ public class ROVER_08 extends Rover {
 	        Set<Coord> tilesRoverCanAddInformationAbout = null; // coords of all tiles rover can gather
 	        Set<Coord> unexploredTiles = null; // coords of all tiles with Terrain.UNKOWN
 	        Set<Coord> teamMemberLocations = null;
-	        Set<Coord> tilesRoverCanRescan = null;
 	        
 	        Coord closestResourceCanGather = null; // closest resource rover can pick up
 	        Coord closestTileToExplore = null; // closest tile that the rover can reveal some information about
@@ -280,7 +287,7 @@ public class ROVER_08 extends Rover {
 	            tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
 	            unexploredTiles = unknownTiles(tiles);
 	            teamMemberLocations = teamMemberLocations(tiles);       
-	            tilesRoverCanRescan = tilesRoverCanRescan(tiles); 
+	            tilesRoverCanRescan.addAll(tilesRoverCanRescan(tiles)); 
 	            
 	            // testing...
 	            // prints out many variables to the Console to see if the are correct for debug purposes
