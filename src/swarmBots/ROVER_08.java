@@ -42,6 +42,8 @@ import searchStrategy.graph.Node;
  * 
  * @author heavility modified by: luisfisherjr
  * 
+ * @author also modified a bit by: alvinquach
+ * 
  * ROVER_08 is intended to be a the template for GreenCorp
  * Start by refactoring the class name to match your rovers name.
  * Then do a find and replace to change all the other instances of the 
@@ -56,19 +58,26 @@ import searchStrategy.graph.Node;
 
 public class ROVER_08 extends Rover {
 	
-	// states if rover
+	/** Possible states of the rover. */
 	private enum State {
 		UPDATING_PATH, MOVING, GATHERING, FINDING_RESOURCE, REACHED_TARGET, EXPLORING, SLEEPING
 	}
 	
-	// sub state of rover
+	/** Possible sub-states of the rover. */
 	private enum Mode {
 		SEARCH, DEFEND
 	}
 	
-	private SearchStrategy searchStrategy = new AstarSearch(); // the search that we are using to find paths on graph
-	private Set<Terrain> drivableTerrain = new HashSet<Terrain>(); // the terrain rover can drive on
-	private Set<Terrain> gatherableTerrain = new HashSet<Terrain>(); // the terrain rover can gather on
+	/** The search that we are using to find paths on graph. */
+	private SearchStrategy searchStrategy = new AstarSearch();
+
+	/** The terrain rover can drive on. */
+	private Set<Terrain> drivableTerrain = new HashSet<Terrain>();
+	
+	/** The terrain rover can gather on. */
+	private Set<Terrain> gatherableTerrain = new HashSet<Terrain>();
+
+	/** The sensors that are equipped by the rover. */
 	private Set<RoverToolType> sensors = new HashSet<RoverToolType>(); 
 	
 	private State roverState = State.UPDATING_PATH; // start state    UPDATING_PATH, EXPLORING, FINDING_RESOURCE, GATHERING, MOVING, REACHED_TARGET, PROTECTING
