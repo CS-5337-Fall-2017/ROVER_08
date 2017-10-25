@@ -366,6 +366,9 @@ public class Communication {
             if (roverDetailJson.get("science") != null) {
                 scienceDetail.setScience(Science.valueOf((String) roverDetailJson.get("science")));
             }
+            if (roverDetailJson.get("gathered") != null) {
+                scienceDetail.setGathered(Science.valueOf((String) roverDetailJson.get("gathered")));
+            }
             if (roverDetailJson.get("terrain") != null) {
                 scienceDetail.setTerrain(Terrain.valueOf((String) roverDetailJson.get("terrain")));
             }

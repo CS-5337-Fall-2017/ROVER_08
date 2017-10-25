@@ -5,6 +5,7 @@ import enums.Terrain;
 
 public class ScienceDetail {
 	private Science science;
+	private Science gathered;
 	private boolean hasRover;
 	private int x;
 	private int y;
@@ -18,6 +19,14 @@ public class ScienceDetail {
 
 	public void setScience(Science science) {
 		this.science = science;
+	}
+
+	public Science getGathered() {
+		return gathered;
+	}
+
+	public void setGathered(Science gathered) {
+		this.gathered = gathered;
 	}
 
 	public boolean isHasRover() {

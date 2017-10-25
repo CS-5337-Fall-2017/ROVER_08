@@ -11,7 +11,7 @@ public class MapTile {
 	public int elevation = 0;	// not currently used
 	public int count = 0;  //undefined usage, possibly use on ScanMap for tracking visits
 	private Science science;	//for use on ScanMap, not used on PlanetMap
-	private Science pickedUp;
+	private Science gathered;
 	private boolean hasRover;	//for use on ScanMap, not used on PlanetMap
 	private String roverName = ""; //for keeping track of rover locations from PlanetMap
 	private String scannedBySensor = "0000"; // digits from left to right are Chemical,Radar,Radiation,Spectral
@@ -49,6 +49,13 @@ public class MapTile {
 		this.hasRover = hasR;
 	}
 	
+	public MapTile(Terrain ter, Science sci, Science gat, boolean hasR){
+		this.terrain = ter;
+		this.science = sci;
+		this.gathered = gat;
+		this.hasRover = hasR;
+	}
+	
 	public MapTile(Terrain ter, Science sci, int elev, boolean hasR){
 		this.terrain = ter;
 		this.science = sci;
@@ -80,8 +87,8 @@ public class MapTile {
 		return this.science;
 	}
 
-	public Science getPickedUp() {
-		return pickedUp;
+	public Science getGathered() {
+		return gathered;
 	}
 
 	public int getElevation() {
@@ -91,7 +98,6 @@ public class MapTile {
 	public boolean getHasRover() {
 		return this.hasRover;
 	}
-	
 	
 	public String getScannedBySensorValue() {
 		return this.scannedBySensor;
@@ -146,8 +152,8 @@ public class MapTile {
 		this.science = sci;
 	}
 	
-	public void setPickedUp(Science pickedUp) {
-		this.pickedUp = pickedUp;
+	public void getGathered(Science gathered) {
+		this.gathered = gathered;
 	}
 
 	public void setRoverName(String roverName) {

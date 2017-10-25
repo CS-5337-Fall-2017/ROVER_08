@@ -15,8 +15,9 @@ public class CommunicationHelper {
         
     	Terrain terrain = getTerrain((String) o.get("terrain"));
         Science science = getScience((String) o.get("science"));
+        Science gathered = getScience((String) o.get("gathered"));
         
-        MapTile tile = new MapTile(terrain, science, false);
+        MapTile tile = new MapTile(terrain, science, gathered, false);
         
         tile.setScannedBySensor((String) o.get("scanned"));
         tile.setRoverName((String) o.get("rover"));
