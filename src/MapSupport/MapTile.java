@@ -3,7 +3,6 @@ package MapSupport;
 import java.util.HashSet;
 import java.util.Set;
 
-import enums.RoverToolType;
 import enums.Science;
 import enums.Terrain;
 
@@ -12,6 +11,7 @@ public class MapTile {
 	public int elevation = 0;	// not currently used
 	public int count = 0;  //undefined usage, possibly use on ScanMap for tracking visits
 	private Science science;	//for use on ScanMap, not used on PlanetMap
+	private Science pickedUp;
 	private boolean hasRover;	//for use on ScanMap, not used on PlanetMap
 	private String roverName = ""; //for keeping track of rover locations from PlanetMap
 	private String scannedBySensor = "0000"; // digits from left to right are Chemical,Radar,Radiation,Spectral
@@ -80,6 +80,10 @@ public class MapTile {
 		return this.science;
 	}
 
+	public Science getPickedUp() {
+		return pickedUp;
+	}
+
 	public int getElevation() {
 		return this.elevation;
 	}
@@ -142,6 +146,10 @@ public class MapTile {
 		this.science = sci;
 	}
 	
+	public void setPickedUp(Science pickedUp) {
+		this.pickedUp = pickedUp;
+	}
+
 	public void setRoverName(String roverName) {
 		this.roverName = roverName;
 	}
