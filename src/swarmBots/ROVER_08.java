@@ -1026,7 +1026,7 @@ public class ROVER_08 extends Rover {
 			return result;
 		}
 		for (Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
-			if (sensors.contains(resourceScannerMap.get(entry.getValue().getPickedUp()))) {
+			if (sensors.contains(resourceScannerMap.get(entry.getValue().getScience()))) {
 				result.add(entry.getKey());
 			}
 		}
