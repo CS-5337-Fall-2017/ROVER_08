@@ -83,7 +83,7 @@ public class ROVER_08 extends Rover {
 	private long gatherCooldown = 3400L + lagCushion; // default to gather speed from RPC + 30
 	private long sleepTime = 200L;
 	
-	private final Map<String, String> resourceScannerMap = new HashMap<>();
+	private final Map<Science, RoverToolType> resourceScannerMap = new HashMap<>();
 	
 	/**
 	 * Runs the client
@@ -105,7 +105,10 @@ public class ROVER_08 extends Rover {
 	public ROVER_08() {
 		// constructor
 		rovername = "ROVER_08"; // rover 1 is fasted used for testing
-//		resourceScannerMap("")
+		resourceScannerMap.put(Science.RADIOACTIVE, RoverToolType.RADIATION_SENSOR);
+		resourceScannerMap.put(Science.ORGANIC, RoverToolType.CHEMICAL_SENSOR);
+		resourceScannerMap.put(Science.CRYSTAL, RoverToolType.SPECTRAL_SENSOR);
+		resourceScannerMap.put(Science.MINERAL, RoverToolType.RADAR_SENSOR);
 		System.out.println(rovername + " rover object constructed");
 		
 	}
@@ -292,6 +295,7 @@ public class ROVER_08 extends Rover {
 				System.out.println("resources " + rovername + " tiles can walk on: " + tilesRoverCanWalkOn.size());
 				System.out.println("resources " + rovername + " tiles can gather: " + tilesRoverCanGather.size());
 				System.out.println("resources " + rovername + " tiles can protect: " + tilesRoverCanProtect.size());
+				System.out.println("resources " + rovername + " tiles can rescan: " + tilesThatContainedScannableScience.size());
 				
 				// this is the Rovers HeartBeat, it regulates how fast the Rover cycles through the control loop
 				// sleep until move cooldown is over
@@ -1017,24 +1021,15 @@ public class ROVER_08 extends Rover {
 	 * @return Returns a set of coordinates of tiles that used to contain (but is no longer reported as containing) the types of science that is scannable by the rover.
 	 */
 	private Set<Coord> tilesThatContainedScannableScience(Map<Coord, MapTile> coordMaping) {
-		
 		Set<Coord> result = new HashSet<>();
-		
 		if (sensors.isEmpty()) {
 			return result;
 		}
-		
-		Coord coord;
-		MapTile tile;
-		String terrain;
-		
 		for (Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
-			
-			coord = entry.getKey();
-			tile = entry.getValue();
-			
+			if (sensors.contains(resourceScannerMap.get(entry.getValue().getPickedUp()))) {
+				result.add(entry.getKey());
+			}
 		}
-		
 		return result;
 	}
 	
