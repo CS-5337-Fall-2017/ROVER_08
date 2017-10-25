@@ -60,7 +60,14 @@ public class ROVER_08 extends Rover {
 	
 	/** Possible states of the rover. */
 	private enum State {
-		UPDATING_PATH, MOVING, GATHERING, FINDING_RESOURCE, REACHED_TARGET, EXPLORING, SLEEPING
+		UPDATING_PATH,
+		MOVING,
+		GATHERING,
+		FINDING_RESOURCE,
+		REACHED_TARGET,
+		EXPLORING,
+		RESCANNING,
+		SLEEPING
 	}
 	
 	/** Possible sub-states of the rover. */
