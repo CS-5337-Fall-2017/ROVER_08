@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
@@ -18,15 +20,11 @@ import MapSupport.MapTile;
 import MapSupport.PlanetMap;
 import MapSupport.ScanMap;
 import common.Rover;
-
 import communicationInterface.Communication;
-
 import enums.RoverDriveType;
-
 import enums.RoverToolType;
 import enums.Science;
 import enums.Terrain;
-
 import searchStrategy.AstarSearch;
 import searchStrategy.SearchStrategy;
 import searchStrategy.graph.Edge;
@@ -69,9 +67,9 @@ public class ROVER_08 extends Rover {
 	}
 	
 	private SearchStrategy searchStrategy = new AstarSearch(); // the search that we are using to find paths on graph
-	private Set<String> drivableTerrain = new HashSet<String>(); // the terrain rover can drive on
-	private Set<String> gatherableTerrain = new HashSet<String>(); // the terrain rover can gather on
-	private Set<String> sensors = new HashSet<String>(); 
+	private Set<Terrain> drivableTerrain = new HashSet<Terrain>(); // the terrain rover can drive on
+	private Set<Terrain> gatherableTerrain = new HashSet<Terrain>(); // the terrain rover can gather on
+	private Set<RoverToolType> sensors = new HashSet<RoverToolType>(); 
 	
 	private State roverState = State.UPDATING_PATH; // start state    UPDATING_PATH, EXPLORING, FINDING_RESOURCE, GATHERING, MOVING, REACHED_TARGET, PROTECTING
 	private Mode roverMode = Mode.SEARCH; // start mode    EXPLORING, DEFENDING
@@ -85,7 +83,7 @@ public class ROVER_08 extends Rover {
 	private long gatherCooldown = 3400L + lagCushion; // default to gather speed from RPC + 30
 	private long sleepTime = 200L;
 	
-
+	private final Map<String, String> resourceScannerMap = new HashMap<>();
 	
 	/**
 	 * Runs the client
@@ -107,13 +105,13 @@ public class ROVER_08 extends Rover {
 	public ROVER_08() {
 		// constructor
 		rovername = "ROVER_08"; // rover 1 is fasted used for testing
+//		resourceScannerMap("")
 		System.out.println(rovername + " rover object constructed");
+		
 	}
 	
 	public ROVER_08(String serverAddress) {
-		// constructor
-		rovername = "ROVER_08"; // rover 1 is fasted used for testing
-		System.out.println(rovername + " rover object constructed");
+		this();
 		SERVER_ADDRESS = serverAddress;
 	}
 	
@@ -203,7 +201,7 @@ public class ROVER_08 extends Rover {
 	        Set<Coord> tilesRoverCanAddInformationAbout = null; // coords of all tiles rover can gather
 	        Set<Coord> unexploredTiles = null; // coords of all tiles with Terrain.UNKOWN
 	        Set<Coord> teamMemberLocations = null;
-	        
+	        Set<Coord> tilesThatContainedScannableScience = null;
 	        
 	        Coord closestResourceCanGather = null; // closest resource rover can pick up
 	        Coord closestTileToExplore = null; // closest tile that the rover can reveal some information about
@@ -279,9 +277,7 @@ public class ROVER_08 extends Rover {
 	            tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
 	            unexploredTiles = unknownTiles(tiles);
 	            teamMemberLocations = teamMemberLocations(tiles);       
-	            
-	            //TODO add set of all resources revield
-	            // tilestThatHadResources = tilestThatHadResources(tiles); 
+	            tilesThatContainedScannableScience = tilesThatContainedScannableScience(tiles); 
 	            
 	            // testing...
 	            // prints out many variables to the Console to see if the are correct for debug purposes
@@ -642,7 +638,7 @@ public class ROVER_08 extends Rover {
 		MapTile nextMoveGobalTile = globalMap.getTile(nextCoord);
 		
 		boolean nextHasRover = nextMoveGobalTile.getHasRover();
-		String nextTerrain = nextMoveGobalTile.getTerrain().getTerString();
+		Terrain nextTerrain = nextMoveGobalTile.getTerrain();
 		
 		return (!nextHasRover && drivableTerrain.contains(nextTerrain));
 	}
@@ -780,27 +776,27 @@ public class ROVER_08 extends Rover {
 		switch (drive) {
 		
 		case WALKER:
-			drivableTerrain.add(Terrain.UNKNOWN.getTerString()); 
-			drivableTerrain.add(Terrain.SOIL.getTerString());
-			drivableTerrain.add(Terrain.GRAVEL.getTerString());
+			drivableTerrain.add(Terrain.UNKNOWN); 
+			drivableTerrain.add(Terrain.SOIL);
+			drivableTerrain.add(Terrain.GRAVEL);
 			
-			drivableTerrain.add(Terrain.ROCK.getTerString());
+			drivableTerrain.add(Terrain.ROCK);
 			moveCooldown = 1200L;
 			break;
 			
 		case TREADS:
-			drivableTerrain.add(Terrain.UNKNOWN.getTerString()); 
-			drivableTerrain.add(Terrain.SOIL.getTerString());
-			drivableTerrain.add(Terrain.GRAVEL.getTerString());
+			drivableTerrain.add(Terrain.UNKNOWN); 
+			drivableTerrain.add(Terrain.SOIL);
+			drivableTerrain.add(Terrain.GRAVEL);
 			
-			drivableTerrain.add(Terrain.SAND.getTerString());
+			drivableTerrain.add(Terrain.SAND);
 			moveCooldown = 900L;
 			break;
 			
 		case WHEELS:
-			drivableTerrain.add(Terrain.UNKNOWN.getTerString()); 
-			drivableTerrain.add(Terrain.SOIL.getTerString());
-			drivableTerrain.add(Terrain.GRAVEL.getTerString());
+			drivableTerrain.add(Terrain.UNKNOWN); 
+			drivableTerrain.add(Terrain.SOIL);
+			drivableTerrain.add(Terrain.GRAVEL);
 			moveCooldown = 400L;
 			break;
 			
@@ -822,13 +818,13 @@ public class ROVER_08 extends Rover {
 		switch (tool) {
 		
 		case EXCAVATOR:
-			gatherableTerrain.add(Terrain.SAND.getTerString());
-			gatherableTerrain.add(Terrain.SOIL.getTerString());
+			gatherableTerrain.add(Terrain.SAND);
+			gatherableTerrain.add(Terrain.SOIL);
 			break;
 			
 		case DRILL:
-			gatherableTerrain.add(Terrain.ROCK.getTerString());
-			gatherableTerrain.add(Terrain.GRAVEL.getTerString());
+			gatherableTerrain.add(Terrain.ROCK);
+			gatherableTerrain.add(Terrain.GRAVEL);
 			break;
 			
 		default:
@@ -839,35 +835,20 @@ public class ROVER_08 extends Rover {
 	
 	/**
 	 * Helper method used in the method setEquipment(List<String>). This method modifies
-	 * the sensor class variable by adding elements to it.
+	 * Adds the {@code RoverToolType} to the sensor set only if it is a sensor tool.
 	 * 
-	 * @param RoverDriveType tool : tool type of the rover
+	 * @param tool: tool type of the rover
 	 */
 	private void setSensors(RoverToolType tool) {
-		// all types can traverse these
-		
-		switch (tool) {
-		
-		case CHEMICAL_SENSOR:
-			sensors.add("CHEMICAL_SENSOR");
-			break;
+		if (tool == RoverToolType.RADIATION_SENSOR ||
+			tool == RoverToolType.CHEMICAL_SENSOR ||
+			tool == RoverToolType.SPECTRAL_SENSOR ||
+			tool == RoverToolType.RADAR_SENSOR) {
 			
-		case RADAR_SENSOR:
-			sensors.add("RADAR_SENSOR");
-			break;
-			
-		case RADIATION_SENSOR:
-			sensors.add("RADIATION_SENSOR");
-			break;
-			
-		case SPECTRAL_SENSOR:
-			sensors.add("SPECTRAL_SENSOR");
-			break;
-		default:
-			break;
+			sensors.add(tool);
 		}
 	}
-	
+
 	/**
  	 * Method that returns the closest Coord to the rover from a Set of coordinates.
 	 * 
@@ -914,18 +895,14 @@ public class ROVER_08 extends Rover {
 		Set<Coord> canGatherOn = new HashSet<Coord>();
 		
 		MapTile tile = null;
-		String terrain = "";
 		
 		for(Coord coord: canWalkOnWithResources) {
-		
 			
 			tile = globalMap.getTile(coord);
 			
 			if (tile.getScience().equals(Science.NONE)) continue;
 			
-			terrain = tile.getTerrain().getTerString();
-			
-			if(gatherableTerrain.contains(terrain)) {
+			if (gatherableTerrain.contains(tile.getTerrain())) {
 				
 				canGatherOn.add(coord);
 			}
@@ -948,18 +925,14 @@ public class ROVER_08 extends Rover {
 		Set<Coord> canProtectOn = new HashSet<Coord>();
 		
 		MapTile tile = null;
-		String terrain = "";
 		
 		for(Coord coord: canWalkOnWithResources) {
-		
 			
 			tile = globalMap.getTile(coord);
 			
 			if (tile.getScience().equals(Science.NONE)) continue;
 			
-			terrain = tile.getTerrain().getTerString();
-			
-			if(!gatherableTerrain.contains(terrain)) {
+			if(!gatherableTerrain.contains(tile.getTerrain())) {
 				
 				canProtectOn.add(coord);
 			}
@@ -983,15 +956,13 @@ public class ROVER_08 extends Rover {
 		
 		Coord coord;
 		MapTile tile;
-		String terrain;
 		
 		for (Map.Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
 			
 			coord = entry.getKey();
 			tile = entry.getValue();
-			terrain = tile.getTerrain().getTerString();
 			
-			if(drivableTerrain.contains(terrain) && !tile.getHasRover()) {
+			if(drivableTerrain.contains(tile.getTerrain()) && !tile.getHasRover()) {
 				
 				canWalkOn.add(coord);
 			}
@@ -1023,15 +994,13 @@ public class ROVER_08 extends Rover {
 		
 		Coord coord;
 		MapTile tile;
-		String terrain;
 		
 		for (Map.Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
 			
 			coord = entry.getKey();
 			tile = entry.getValue();
-			terrain = tile.getTerrain().getTerString();
 			
-			if(terrain.equals(Terrain.UNKNOWN.getTerString())) {
+			if(tile.getTerrain().equals(Terrain.UNKNOWN)) {
 				
 				unknownTiles.add(coord);
 			}
@@ -1040,31 +1009,33 @@ public class ROVER_08 extends Rover {
 		return unknownTiles;
 	}
 	
-	//TODO add set of all resources revield
-	private Set<Coord> tilestThatHadResources(Map<Coord, MapTile> coordMaping) {
+	/**
+	 * Returns a set of coordinates of tiles that previously contained the types of science that is scannable by the equipment on the rover.
+	 * Tiles that are being reported as still containing science will not be included in the resulting set.
+	 * If the rover is not equipped for scanning, then this method will return an empty set. 
+	 * @param coordMaping The map data.
+	 * @return Returns a set of coordinates of tiles that used to contain (but is no longer reported as containing) the types of science that is scannable by the rover.
+	 */
+	private Set<Coord> tilesThatContainedScannableScience(Map<Coord, MapTile> coordMaping) {
 		
-		Set<Coord> uknownTiles = new HashSet<>();
+		Set<Coord> result = new HashSet<>();
+		
+		if (sensors.isEmpty()) {
+			return result;
+		}
 		
 		Coord coord;
 		MapTile tile;
 		String terrain;
 		
-		for (Map.Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
+		for (Entry<Coord, MapTile> entry : coordMaping.entrySet()) {
 			
 			coord = entry.getKey();
 			tile = entry.getValue();
 			
-			//TODO change
-			terrain = tile.getTerrain().getTerString();
-			
-			
-			if(terrain.equals(Terrain.UNKNOWN.getTerString())) {
-				
-				uknownTiles.add(coord);
-			}
 		}
 		
-		return uknownTiles;
+		return result;
 	}
 	
 	
@@ -1086,7 +1057,7 @@ public class ROVER_08 extends Rover {
 		
 		Coord coord;
 		MapTile tile;
-		String terrain;
+		Terrain terrain;
 		
 		if(sensors.size() > 0) { // if rover has any sensor do this for loop
 			
@@ -1097,9 +1068,9 @@ public class ROVER_08 extends Rover {
 				
 				scannedBy = tile.getScannedBySensors();
 				
-				for (String sensor: sensors) {
+				for (RoverToolType sensor: sensors) {
 					
-					if(!scannedBy.contains(sensor)) {
+					if(!scannedBy.contains(sensor.name())) {
 						
 						tilesRoverCanAddInformationAbout.add(coord);
 						break;
@@ -1113,9 +1084,9 @@ public class ROVER_08 extends Rover {
 				
 				coord = entry.getKey();
 				tile = entry.getValue();
-				terrain = tile.getTerrain().getTerString();
+				terrain = tile.getTerrain();
 				
-				if(terrain.equals(Terrain.UNKNOWN.getTerString())) {
+				if(terrain.equals(Terrain.UNKNOWN)) {
 					
 					tilesRoverCanAddInformationAbout.add(coord);
 				}
@@ -1170,10 +1141,10 @@ public class ROVER_08 extends Rover {
 		
 		char[] sensorArray = {'0','0','0','0'};
 		
-		if (sensors.contains("CHEMICAL_SENSOR")) sensorArray[0] = '1';
-		if (sensors.contains("RADAR_SENSOR")) sensorArray[1] = '1';
-		if (sensors.contains("RADIATION_SENSOR")) sensorArray[2] = '1';
-		if (sensors.contains("SPECTRAL_SENSOR")) sensorArray[3] = '1';
+		if (sensors.contains(RoverToolType.CHEMICAL_SENSOR)) sensorArray[0] = '1';
+		if (sensors.contains(RoverToolType.RADAR_SENSOR)) sensorArray[1] = '1';
+		if (sensors.contains(RoverToolType.RADIATION_SENSOR)) sensorArray[2] = '1';
+		if (sensors.contains(RoverToolType.SPECTRAL_SENSOR)) sensorArray[3] = '1';
 		
 		return new String(sensorArray);
 	}
