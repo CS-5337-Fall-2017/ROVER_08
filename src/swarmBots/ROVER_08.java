@@ -332,9 +332,8 @@ public class ROVER_08 extends Rover {
 	            	
 	            	switch (roverState) {
 	            	
+	            	// Rover currently cannot enter sleep mode.
 	            	case SLEEPING:
-	            		
-	            		//TODO change the sleep so that it now rescans previously scanned resources
 	            		
 	            		Thread.sleep(sleepTime);
 	            		
@@ -348,8 +347,8 @@ public class ROVER_08 extends Rover {
 	            				roverState = State.FINDING_RESOURCE;
 	            			}
 	            			else {
-	            				System.out.println("no change in map changing state to SLEEPING...");
-	            				roverState = State.SLEEPING;
+	            				System.out.println("no change in map changing state to RESCANNING...");
+	            				roverState = State.RESCANNING;
 	            			}
 	            		}
 	            		else if (roverMode.equals(Mode.DEFEND)) {
@@ -382,8 +381,8 @@ public class ROVER_08 extends Rover {
 	            			}
 	            			else { 
 	            				
-	            				System.out.println("no tiles to explore entering state SLEEPING...");
-	            				roverState = State.SLEEPING;
+	            				System.out.println("no tiles to explore entering state RESCANNING...");
+	            				roverState = State.RESCANNING;
 	            			}	          
 	            		}
 	            		
@@ -421,9 +420,9 @@ public class ROVER_08 extends Rover {
 		            		}
 		            		else {
 		            			
-								System.out.println("no protection targets available entering state SLEEPING...");
+								System.out.println("no protection targets available entering state RESCANNING...");
 								System.out.println("changing mode to SEARCH...");
-								roverState = State.SLEEPING;
+								roverState = State.RESCANNING;
 								roverMode = Mode.SEARCH;
 		            		}
 						}
@@ -493,8 +492,8 @@ public class ROVER_08 extends Rover {
 							
 							if (manhattenDistance(currentLoc, closestTeamMember) > 4) { // if target has a resource that rover cant gather
 						
-								System.out.println("waiting for friendly target entering state SLEEPING...");
-								roverState = State.SLEEPING;
+								System.out.println("waiting for friendly target entering state RESCANNING...");
+								roverState = State.RESCANNING;
 							}
 							else {
 								
@@ -594,9 +593,13 @@ public class ROVER_08 extends Rover {
 						}
 						
 						break;
+						
+					case RESCANNING:
+						// TODO Implement this
+						break;
 					}
 	            	
-	            } while (roverState != State.MOVING && roverState != State.SLEEPING); // if rover has reached a target to defend exit loop
+	            } while (roverState != State.MOVING && roverState != State.RESCANNING); // if rover has reached a target to defend exit loop
 	            
 	            /** #### end of Rover State Machine loop  #### */
 	            
