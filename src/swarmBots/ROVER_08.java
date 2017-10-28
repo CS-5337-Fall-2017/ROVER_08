@@ -65,9 +65,7 @@ public class ROVER_08 extends Rover {
 		GATHERING,
 		FINDING_RESOURCE,
 		REACHED_TARGET,
-		EXPLORING,
-		RESCANNING,
-		SLEEPING
+		EXPLORING
 	}
 	
 	/** Possible sub-states of the rover. */
@@ -980,7 +978,7 @@ public class ROVER_08 extends Rover {
 	private Set<Coord> tilesRoverCanWalkOnOrAddInformation(Map<Coord, MapTile> coordMaping) {
 		
 		Set<Coord> canWalkOnAndAddInformationTo = tilesRoverCanWalkOn(coordMaping);
-		canWalkOnAndAddInformationTo.addAll(tilesRoverCanAddInformationAbout(coordMaping));
+		//canWalkOnAndAddInformationTo.addAll(tilesRoverCanAddInformationAbout(coordMaping));
 		
 		return canWalkOnAndAddInformationTo;
 	}
