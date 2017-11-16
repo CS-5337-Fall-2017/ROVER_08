@@ -224,21 +224,22 @@ public class ROVER_08 extends Rover {
 
 	        List<Coord> previousPositions = new ArrayList<Coord>();
 
-	        Map<Coord, MapTile> tiles = null; // data from global map
-	        Set<Coord> tilesRoverCanWalkOn = null; // coords of all tiles rover can walk on
-	        Set<Coord> tilesRoverCanGather = null; // coords of all tiles rover can gather
-	        Set<Coord> tilesRoverCanProtect = null;
-	        Set<Coord> tilesRoverCanAddInformationAbout = null; // coords of all tiles rover can gather
-	        Set<Coord> unexploredTiles = null; // coords of all tiles with Terrain.UNKOWN
-	        Set<Coord> teamMemberLocations = null;
-	        
+//	        Map<Coord, MapTile> tiles = null; // data from global map
+//	        Set<Coord> tilesRoverCanWalkOn = null; // coords of all tiles rover can walk on
+//	        Set<Coord> tilesRoverCanGather = null; // coords of all tiles rover can gather
+//	        Set<Coord> tilesRoverCanProtect = null;
+//	        Set<Coord> tilesRoverCanAddInformationAbout = null; // coords of all tiles rover can gather
+//	        Set<Coord> unexploredTiles = null; // coords of all tiles with Terrain.UNKOWN
+//	        Set<Coord> teamMemberLocations = null;
+//	        
+	        /** Keeps track of how many times the rover has explored a particular tile. */
+	        Map<Coord, Integer> tileExplorationCount = new HashMap<>();
 	        
 	        Set<Coord> tilesToRegather = new HashSet<>(); // saves tiles that can gather for regathering
 	        Set<Coord> tilesToRegatherRemaining = new HashSet<>(); // used in the find resource loop on regather mode 
 	        
 	        
 	        Coord closestResourceCanGather = null; // closest resource rover can pick up
-	        Coord closestTileToExplore = null; // closest tile that the rover can reveal some information about
 	        Coord closestTeamMember = null; // closest tile that the rover can reveal some information about
 	        Coord closestTileToRegather = null;
 	        // stack that allows rover to target resources on way to a final destination
@@ -303,14 +304,14 @@ public class ROVER_08 extends Rover {
 //				scanMap.debugPrintMap();
 	            
 	            // done outside of loop for performance
-	            tiles = globalMap.getAllTiles();
+	            Map<Coord, MapTile> tiles = globalMap.getAllTiles();
 //	            tilesRoverCanWalkOn = tilesRoverCanWalkOn(tiles);
-	            tilesRoverCanWalkOn = tilesRoverCanWalkOnOrAddInformation(tiles);
-	            tilesRoverCanGather = tilesRoverCanGather(tiles);
-	            tilesRoverCanProtect = tilesRoverCanProtect(tiles);
-	            tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
-	            unexploredTiles = unknownTiles(tiles);
-	            teamMemberLocations = teamMemberLocations(tiles);     
+	            Set<Coord> tilesRoverCanWalkOn = tilesRoverCanWalkOnOrAddInformation(tiles);
+	            Set<Coord> tilesRoverCanGather = tilesRoverCanGather(tiles);
+	            Set<Coord> tilesRoverCanProtect = tilesRoverCanProtect(tiles);
+	            Set<Coord> tilesRoverCanAddInformationAbout = tilesRoverCanAddInformationAbout(tiles);
+	            Set<Coord> unexploredTiles = unknownTiles(tiles);
+	            Set<Coord> teamMemberLocations = teamMemberLocations(tiles);     
 	            
 	            tilesToRegather.addAll(tilesRoverCanGather); // adds any new tiles that can be gathered to the set
 	            
@@ -347,11 +348,29 @@ public class ROVER_08 extends Rover {
 
 	            	case EXPLORING: // exploring tiles that rover can add information about
 	            		
-	            		closestTileToExplore = closestTile(tilesRoverCanAddInformationAbout);
+	            		Coord closestTileToExplore = null;
+	            		Double averageExplorationCount = tileExplorationCount.values().stream().mapToInt(Integer::intValue).average().orElse(0.0);
+	            		int targetDistance = 1;
+	            		int tilesEvaluated = 0;
+	            		while (true) {
+		            		Set<Coord> closestTilesToExplore = closestTile(tilesRoverCanAddInformationAbout, 1);
+		            		for (Coord tile : closestTilesToExplore) {
+		            			if (tileExplorationCount.get(tile) <= averageExplorationCount) {
+		            				closestTileToExplore = tile;
+		            				break;
+		            			}
+		            		}
+		            		if (closestTileToExplore != null) {
+		            			break;
+		            		}
+		            		targetDistance++;
+		            		tilesEvaluated += closestTilesToExplore
+	            		}
 	            		
 	            		if (closestTileToExplore != null) { // if you can add data to the map
 	            			
 	            			targetLocations.push(closestTileToExplore);
+	            			
 	            			
 	            			System.out.println("new target to explore found entering state UPDATING_PATH...");
 							roverState = State.UPDATING_PATH;
@@ -379,7 +398,7 @@ public class ROVER_08 extends Rover {
 						
 						if (roverMode.equals(Mode.SEARCH)) {
 							
-							closestResourceCanGather = closestTile(tilesRoverCanGather);
+							closestResourceCanGather = closestTile(tilesRoverCanGather, 1);
 							
 							if (closestResourceCanGather != null) {
 								
@@ -396,7 +415,7 @@ public class ROVER_08 extends Rover {
 						}
 						else if (roverMode.equals(Mode.REGATHER)) {
 							
-							closestTileToRegather = closestTile(tilesToRegatherRemaining);
+							closestTileToRegather = closestTile(tilesToRegatherRemaining, 1);
 							
 		            		
 		            		if (closestTileToRegather != null) {
@@ -532,7 +551,7 @@ public class ROVER_08 extends Rover {
 						
 						targetLocation = targetLocations.peek();
 						
-						closestResourceCanGather = closestTile(tilesRoverCanGather);
+						closestResourceCanGather = closestTile(tilesRoverCanGather, 1);
 						
 						if (closestResourceCanGather != null) { // checks if there is a resource to get on path to target
 							
@@ -879,12 +898,13 @@ public class ROVER_08 extends Rover {
 	 * 
 	 * @return Coord : the closest coord by manhattan distance
 	 */
-	private Coord closestTile(Set<Coord> coordinates) {
+	private Set<Coord> closestTile(Set<Coord> coordinates, int minimumDistance) {
 		
-		if (coordinates == null) return null;
-		if (coordinates.size() == 0) return null;
+		if (coordinates == null || coordinates.isEmpty()) {
+			return null;
+		}
 		
-		Coord closestCoord = null;
+		Set<Coord> result = new HashSet<>();
 
 		int closestDistance = Integer.MAX_VALUE;
 		
@@ -892,18 +912,19 @@ public class ROVER_08 extends Rover {
 			
 			int distance = manhattenDistance(currentLoc, coord);
 			
-			if (distance == 0) {
+			if (distance < minimumDistance) {
 				continue;
 			}
-			
-			if (distance < closestDistance) {
-				
-				closestDistance = distance;
-				closestCoord = coord;
+			if (distance <= closestDistance) {
+				if (distance < closestDistance) {
+					result.clear();
+					closestDistance = distance;
+				}
+				result.add(coord);
 			}	
 		}
 		
-		return closestCoord;
+		return result;
 	}
 	
 	
