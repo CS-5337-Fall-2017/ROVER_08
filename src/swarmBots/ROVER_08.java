@@ -886,12 +886,15 @@ public class ROVER_08 extends Rover {
 		
 		Coord closestCoord = null;
 
-		int distance = 0;
 		int closestDistance = Integer.MAX_VALUE;
 		
 		for(Coord coord: coordinates) {
 			
-			distance = manhattenDistance(currentLoc, coord);
+			int distance = manhattenDistance(currentLoc, coord);
+			
+			if (distance == 0) {
+				continue;
+			}
 			
 			if (distance < closestDistance) {
 				
