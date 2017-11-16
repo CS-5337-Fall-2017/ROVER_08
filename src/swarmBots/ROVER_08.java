@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
@@ -218,7 +221,9 @@ public class ROVER_08 extends Rover {
 	    	List<Edge> path = null; // path rover will take using searchStrategy and graph
 	        Edge nextMove = null; // edge containing from current -> next node in graph coord
 	        long startTime = 0; // used to check how long  outer while loop takes
-	        
+
+	        List<Coord> previousPositions = new ArrayList<Coord>();
+
 	        Map<Coord, MapTile> tiles = null; // data from global map
 	        Set<Coord> tilesRoverCanWalkOn = null; // coords of all tiles rover can walk on
 	        Set<Coord> tilesRoverCanGather = null; // coords of all tiles rover can gather
@@ -562,14 +567,28 @@ public class ROVER_08 extends Rover {
 							System.out.println("moved to next MapTile entering state MOVING...");
 							roverState = State.MOVING;
 						}
-						else {
+						else { // if there is an obstacle
+							
+							if(backtracking(previousPositions)) { // if you have recently been on the current tile
+								
+								System.out.println("path blocked and backtracked recently... ");
+								
+								previousPositions.clear(); // clear list of previous tiles
+								targetLocations.clear(); // clear all targets this allows for resource gathering on way to target
+								System.out.println("clearing targets...");
+								
+								targetLocations.add(randomWalkAbleCoord(tilesRoverCanWalkOn)); // add random target
+								System.out.println("setting random target...");
+								
+								System.out.println("entering state UPDATING_PATH...");
+								roverState = State.UPDATING_PATH;
+							}
 							
 							tilesRoverCanWalkOn.remove((Coord)nextMove.getTo().getData()); // removes coord to recalculate new path
 							
 							System.out.println("path blocked entering state UPDATING_PATH...");
 							roverState = State.UPDATING_PATH;
 						}
-						
 						break;
 					}
 	            	
@@ -1187,6 +1206,48 @@ public class ROVER_08 extends Rover {
 		}
 		
 		return roverCoords;
+	}
+	
+	private boolean backtracking(List<Coord> previousPositions) {
+		
+		int length = previousPositions.size();
+		
+		if (length < 5) {
+			return false;
+		}
+		
+
+		int index = length - 1;
+		
+		Coord curr = previousPositions.get(index);
+		
+		// only checks the previous 5 steps
+		for(index--; index > length - 6; index--) {
+			
+			if(curr.equals(previousPositions.get(index))) {
+				return true;
+			}
+			
+		}
+		
+		return false;
+	}
+	
+	private Coord randomWalkAbleCoord(Set<Coord> roverCanWalkOn) {
+		
+		Random ran = new Random();
+		
+		int index = ran.nextInt(roverCanWalkOn.size());
+		
+		Iterator<Coord> iter = roverCanWalkOn.iterator();
+		
+		for (int i = 0; i < index; i++) {	    
+			
+			iter.next();
+		}
+		
+		return iter.next();
+
 	}
 	
 }
